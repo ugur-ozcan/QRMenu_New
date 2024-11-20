@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using QRMenu.Application.DTOs;
- 
 using QRMenu.Core.Entities;
-using QRMenu.Core.ValueObjects;
 
 namespace QRMenu.Application.Common.Mappings;
 
@@ -10,54 +8,32 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        // Company Mappings
-        CreateMap<Company, CompanyDto>()
-            .ForMember(d => d.LanguagesSupported, opt =>
-                opt.MapFrom(s => s.LanguagesSupported?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>()))
-            .ForMember(d => d.Branches, opt => opt.ExplicitExpansion())
-            .ForMember(d => d.BusinessHours, opt => opt.ExplicitExpansion());
+        // Company
+        CreateMap<Company, CompanyDto>();
+        CreateMap<CompanyDto, Company>();
 
-        CreateMap<CompanyDto, Company>()
-            .ForMember(d => d.LanguagesSupported, opt =>
-                opt.MapFrom(s => string.Join(",", s.LanguagesSupported ?? new List<string>())));
+        // Branch
+        CreateMap<Branch, BranchDto>();
+        CreateMap<BranchDto, Branch>();
 
-        // Branch Mappings
-        CreateMap<Branch, BranchDto>()
-            .ForMember(d => d.LanguagesSupported, opt =>
-                opt.MapFrom(s => s.LanguagesSupported?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>()))
-            .ForMember(d => d.BusinessHours, opt => opt.ExplicitExpansion());
-
-        CreateMap<BranchDto, Branch>()
-            .ForMember(d => d.LanguagesSupported, opt =>
-                opt.MapFrom(s => string.Join(",", s.LanguagesSupported ?? new List<string>())));
-
-        // User Mappings
+        // User
         CreateMap<User, UserDto>();
         CreateMap<UserDto, User>();
 
-        // Dealer Mappings
-        CreateMap<Dealer, DealerDto>()
-            .ForMember(d => d.Companies, opt => opt.ExplicitExpansion());
+        // Dealer
+        CreateMap<Dealer, DealerDto>();
         CreateMap<DealerDto, Dealer>();
 
-        // Theme Mappings
-        CreateMap<Theme, ThemeDto>()
-            .ForMember(d => d.CompanyThemes, opt => opt.ExplicitExpansion());
+        // Theme
+        CreateMap<Theme, ThemeDto>();
         CreateMap<ThemeDto, Theme>();
 
-        // Template Mappings
-        CreateMap<Template, TemplateDto>()
-            .ForMember(d => d.CompanyThemes, opt => opt.ExplicitExpansion());
+        // Template
+        CreateMap<Template, TemplateDto>();
         CreateMap<TemplateDto, Template>();
 
-        // CompanyTheme Mappings
-        CreateMap<CompanyTheme, CompanyThemeDto>()
-            .ForMember(d => d.Theme, opt => opt.ExplicitExpansion())
-            .ForMember(d => d.Template, opt => opt.ExplicitExpansion());
+        // CompanyTheme
+        CreateMap<CompanyTheme, CompanyThemeDto>();
         CreateMap<CompanyThemeDto, CompanyTheme>();
-
-        // Value Objects
-        CreateMap<Location, LocationDto>().ReverseMap();
-        CreateMap<BusinessHours, BusinessHoursDto>().ReverseMap();
     }
 }

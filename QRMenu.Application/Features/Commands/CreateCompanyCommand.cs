@@ -1,8 +1,7 @@
 ﻿using MediatR;
 using QRMenu.Application.Common;
 using QRMenu.Application.DTOs;
-using QRMenu.Application.DTOs.Company;
-
+ 
 namespace QRMenu.Application.Companies.Commands;
 
 public record CreateCompanyCommand : IRequest<Result<CompanyDto>>
