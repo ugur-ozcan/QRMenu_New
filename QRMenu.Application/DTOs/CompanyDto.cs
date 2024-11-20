@@ -1,4 +1,4 @@
-﻿namespace QRMenu.Application.DTOs.Company
+﻿namespace QRMenu.Application.DTOs
 {
     public class CompanyDto : BaseDto
     {

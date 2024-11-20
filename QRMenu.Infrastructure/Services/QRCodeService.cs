@@ -1,6 +1,7 @@
 ﻿using QRMenu.Application.Interfaces;
-using QRCode.NET;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Net.Codecrete.QrCodeGenerator;
 
 namespace QRMenu.Infrastructure.Services;
 
@@ -25,10 +26,8 @@ public class QRCodeService : IQRCodeService
         try
         {
             var url = GetQrCodeUrl(companySlug, branchSlug, tableNumber);
-            var qrGenerator = new QRCodeGenerator();
-            var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new PngByteQRCode(qrCodeData);
-            return qrCode.GetGraphic(20); // 20 pixel boyutunda
+            var qr = QrCode.EncodeText(url, QrCode.Ecc.Medium);
+            return qr.ToBmpBitmap(20); // 20 pixel module size
         }
         catch (Exception ex)
         {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using QRMenu.Application.Interfaces;
- using System.Reflection;
+using System.Reflection;
 using MediatR;
 using FluentValidation;
-using QRMenu.Core.Interfaces;
+using QRMenu.Application.Behaviors;
+using AutoMapper;
 
 namespace QRMenu.Application;
 
@@ -13,30 +13,23 @@ public static class DependencyInjection
     {
         var assembly = Assembly.GetExecutingAssembly();
 
-        services.AddAutoMapper(assembly);
+        // AutoMapper yapılandırması - düzeltilmiş
+        services.AddAutoMapper(cfg => {
+            cfg.AddMaps(assembly);
+            cfg.ShouldMapProperty = p => p.GetMethod?.IsPublic == true;
+        });
+
+        // MediatR yapılandırması
         services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssembly(assembly);
         });
+
+        // FluentValidation yapılandırması
         services.AddValidatorsFromAssembly(assembly);
 
-        // Services
-        services.AddScoped<ICompanyService, CompanyService>();
-        services.AddScoped<IDealerService, DealerService>();
-        services.AddScoped<IBranchService, BranchService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IThemeService, ThemeService>();
-        services.AddScoped<ITemplateService, TemplateService>();
-
-        // Infrastructure Services
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<ICacheService, CacheService>();
-        services.AddScoped<ILogService, LogService>();
-        services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IFileStorageService, FileStorageService>();
-        services.AddScoped<IBackgroundJobService, BackgroundJobService>();
-
-        // Repositories and UnitOfWork
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        // Pipeline Behaviors
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
         return services;
     }

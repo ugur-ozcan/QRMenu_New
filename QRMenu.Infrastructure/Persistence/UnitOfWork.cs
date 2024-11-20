@@ -2,6 +2,7 @@
 using QRMenu.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using QRMenu.Infrastructure.Persistence.Repositories;
+using MediatR;
 
 namespace QRMenu.Infrastructure.Persistence
 {
@@ -17,12 +18,14 @@ namespace QRMenu.Infrastructure.Persistence
         private IBaseRepository<Theme> _themes;
         private IBaseRepository<Template> _templates;
         private IBaseRepository<CompanyTheme> _companyThemes;
+        private IBaseRepository<Notification> _notifications; // Bunu ekledik
 
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
         }
-
+        public IBaseRepository<Notification> Notifications =>
+       _notifications ??= new BaseRepository<Notification>(_context);
         public IBaseRepository<User> Users =>
             _users ??= new BaseRepository<User>(_context);
 

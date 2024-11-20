@@ -1,133 +1,91 @@
-﻿using QRMenu.Application.Common;
+﻿using AutoMapper;
+using QRMenu.Application.Common;
 using QRMenu.Application.DTOs;
-using QRMenu.Application.Interfaces;
 using QRMenu.Core.Entities;
 using QRMenu.Core.Interfaces;
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using QRMenu.Application.Interfaces;
+using QRMenu.Core.Specifications;
 
-namespace QRMenu.Infrastructure.Services
+namespace QRMenu.Infrastructure.Services;
+
+public class CompanyThemeService : ICompanyThemeService
 {
-    public class CompanyThemeService : ICompanyThemeService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly ILogger<CompanyThemeService> _logger;
+
+    public CompanyThemeService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        ILogger<CompanyThemeService> logger)
     {
-        private readonly IBaseRepository<CompanyTheme> _companyThemeRepository;
-        private readonly IBaseRepository<Theme> _themeRepository;
-        private readonly IBaseRepository<Template> _templateRepository;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _logger = logger;
+    }
 
-        public CompanyThemeService(
-            IBaseRepository<CompanyTheme> companyThemeRepository,
-            IBaseRepository<Theme> themeRepository,
-            IBaseRepository<Template> templateRepository)
+    public async Task<Result<CompanyThemeDto>> CreateAsync(CompanyThemeDto model)
+    {
+        try
         {
-            _companyThemeRepository = companyThemeRepository;
-            _themeRepository = themeRepository;
-            _templateRepository = templateRepository;
+            var entity = _mapper.Map<CompanyTheme>(model);
+            entity.AppliedAt = DateTime.UtcNow;
+
+            await _unitOfWork.CompanyThemes.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync();
+
+            return Result<CompanyThemeDto>.Success(_mapper.Map<CompanyThemeDto>(entity));
         }
-
-        public async Task<Result<CompanyThemeDto>> CreateAsync(CompanyThemeDto model)
+        catch (Exception ex)
         {
-            var theme = await _themeRepository.GetByIdAsync(model.ThemeId);
-            var template = await _templateRepository.GetByIdAsync(model.TemplateId);
-
-            if (theme == null || template == null)
-            {
-                return Result<CompanyThemeDto>.Failure("Theme or Template not found");
-            }
-
-            var companyTheme = new CompanyTheme
-            {
-                CompanyId = model.CompanyId,
-                ThemeId = model.ThemeId,
-                TemplateId = model.TemplateId,
-                AppliedAt = DateTime.UtcNow
-            };
-
-            await _companyThemeRepository.AddAsync(companyTheme);
-
-            model.Id = companyTheme.Id;
-            model.AppliedAt = companyTheme.AppliedAt;
-            model.Theme = MapThemeToDto(theme);
-            model.Template = MapTemplateToDto(template);
-
-            return Result<CompanyThemeDto>.Success(model);
+            _logger.LogError(ex, "Error creating company theme");
+            return Result<CompanyThemeDto>.Failure("Error creating company theme");
         }
+    }
 
-        public async Task<Result<CompanyThemeDto>> UpdateAsync(int companyId, CompanyThemeDto model)
+    public async Task<Result<CompanyThemeDto>> UpdateAsync(int companyId, CompanyThemeDto model)
+    {
+        try
         {
-            var existingTheme = await _companyThemeRepository.GetEntityWithSpec(new CompanyThemeSpecification(companyId));
-            if (existingTheme == null)
-            {
+            var entity = await GetCompanyThemeByCompanyId(companyId);
+            if (entity == null)
                 return Result<CompanyThemeDto>.Failure("Company theme not found");
-            }
 
-            existingTheme.ThemeId = model.ThemeId;
-            existingTheme.TemplateId = model.TemplateId;
-            existingTheme.AppliedAt = DateTime.UtcNow;
+            _mapper.Map(model, entity);
+            entity.AppliedAt = DateTime.UtcNow;
 
-            await _companyThemeRepository.UpdateAsync(existingTheme);
-
-            var updatedTheme = await _themeRepository.GetByIdAsync(model.ThemeId);
-            var updatedTemplate = await _templateRepository.GetByIdAsync(model.TemplateId);
-
-            model.AppliedAt = existingTheme.AppliedAt;
-            model.Theme = MapThemeToDto(updatedTheme);
-            model.Template = MapTemplateToDto(updatedTemplate);
-
-            return Result<CompanyThemeDto>.Success(model);
+            await _unitOfWork.SaveChangesAsync();
+            return Result<CompanyThemeDto>.Success(_mapper.Map<CompanyThemeDto>(entity));
         }
-
-        public async Task<Result<CompanyThemeDto>> GetByCompanyIdAsync(int companyId)
+        catch (Exception ex)
         {
-            var companyTheme = await _companyThemeRepository.GetEntityWithSpec(new CompanyThemeSpecification(companyId));
-            if (companyTheme == null)
-            {
+            _logger.LogError(ex, "Error updating company theme for company {CompanyId}", companyId);
+            return Result<CompanyThemeDto>.Failure("Error updating company theme");
+        }
+    }
+
+    public async Task<Result<CompanyThemeDto>> GetByCompanyIdAsync(int companyId)
+    {
+        try
+        {
+            var entity = await GetCompanyThemeByCompanyId(companyId);
+            if (entity == null)
                 return Result<CompanyThemeDto>.Failure("Company theme not found");
-            }
 
-            var theme = await _themeRepository.GetByIdAsync(companyTheme.ThemeId);
-            var template = await _templateRepository.GetByIdAsync(companyTheme.TemplateId);
-
-            var dto = new CompanyThemeDto
-            {
-                Id = companyTheme.Id,
-                CompanyId = companyTheme.CompanyId,
-                ThemeId = companyTheme.ThemeId,
-                TemplateId = companyTheme.TemplateId,
-                AppliedAt = companyTheme.AppliedAt,
-                Theme = MapThemeToDto(theme),
-                Template = MapTemplateToDto(template)
-            };
-
-            return Result<CompanyThemeDto>.Success(dto);
+            return Result<CompanyThemeDto>.Success(_mapper.Map<CompanyThemeDto>(entity));
         }
-
-        private ThemeDto MapThemeToDto(Theme theme)
+        catch (Exception ex)
         {
-            return new ThemeDto
-            {
-                Id = theme.Id,
-                Name = theme.Name,
-                PrimaryColor = theme.PrimaryColor,
-                SecondaryColor = theme.SecondaryColor,
-                BackgroundColor = theme.BackgroundColor,
-                ButtonColor = theme.ButtonColor,
-                TitleFontFamily = theme.TitleFontFamily,
-                ContentFontFamily = theme.ContentFontFamily,
-                IsBold = theme.IsBold,
-                IsItalic = theme.IsItalic,
-                FontSize = theme.FontSize
-            };
+            _logger.LogError(ex, "Error getting company theme for company {CompanyId}", companyId);
+            return Result<CompanyThemeDto>.Failure("Error getting company theme");
         }
+    }
 
-        private TemplateDto MapTemplateToDto(Template template)
-        {
-            return new TemplateDto
-            {
-                Id = template.Id,
-                Name = template.Name,
-                HtmlTemplate = template.HtmlTemplate,
-                CssTemplate = template.CssTemplate
-            };
-        }
+    private async Task<CompanyTheme> GetCompanyThemeByCompanyId(int companyId)
+    {
+        var specification = new CompanyThemeSpecification(companyId);
+        var entities = await _unitOfWork.CompanyThemes.ListAsync(specification);
+        return entities.FirstOrDefault();
     }
 }

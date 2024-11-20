@@ -1,13 +1,18 @@
+using QRMenu.Application;
+using QRMenu.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add Application Layer
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
 
+// Add Infrastructure Layer - Configuration'ý da geçiyoruz
+builder.Services.AddInfrastructure(builder.Configuration);
 
-
+ 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,5 +1,5 @@
 ﻿using QRMenu.Core.Entities;
- 
+
 namespace QRMenu.Core.Interfaces
 {
     public interface IUnitOfWork : IDisposable
@@ -11,9 +11,7 @@ namespace QRMenu.Core.Interfaces
         IBaseRepository<Theme> Themes { get; }
         IBaseRepository<Template> Templates { get; }
         IBaseRepository<CompanyTheme> CompanyThemes { get; }
-
-        //Task<int> SaveChangesAsync();
+        IBaseRepository<Notification> Notifications { get; } // Bunu ekledik
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-
     }
 }
