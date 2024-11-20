@@ -27,7 +27,9 @@ public static class DependencyInjection
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IThemeService, ThemeService>();
         services.AddScoped<ITemplateService, TemplateService>();
-
-        return services;
+        services.AddScoped<IQrCodeService, QrCodeService>();
+        services.AddScoped<ICompanyThemeService, CompanyThemeService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+         return services;
     }
 }

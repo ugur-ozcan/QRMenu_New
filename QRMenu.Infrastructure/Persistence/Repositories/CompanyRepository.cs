@@ -1,104 +1,48 @@
-﻿using QRMenu.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using QRMenu.Core.Entities;
 using QRMenu.Core.Interfaces;
-using QRMenu.Core.Specifications;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using QRMenu.Infrastructure.Persistence.Repositories;
 
 namespace QRMenu.Infrastructure.Persistence.Repositories
 {
-    public class CompanyRepository : BaseRepository<Branch>, ICompanyRepository
+    public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
     {
-        public Task<Company> AddAsync(Company entity)
+        public CompanyRepository(ApplicationDbContext context) : base(context)
         {
-            throw new NotImplementedException();
         }
 
-        public Task<int> CountAsync(BaseSpecification<Company> spec)
+        public async Task<bool> SlugExistsAsync(string slug)
         {
-            throw new NotImplementedException();
+            return await _dbSet.AnyAsync(c => c.Slug == slug);
         }
 
-        public Task DeleteAsync(Company entity)
+        public async Task<IReadOnlyList<Company>> GetByDealerIdAsync(int dealerId)
         {
-            throw new NotImplementedException();
+            return await _dbSet.Where(c => c.DealerId == dealerId).ToListAsync();
         }
 
-        Task<Company> IBaseRepository<Company>.AddAsync(Company entity)
+        public async Task<Company> GetBySlugAsync(string slug)
         {
-            throw new NotImplementedException();
+            return await _dbSet.FirstOrDefaultAsync(c => c.Slug == slug);
         }
 
-        Task<int> IBaseRepository<Company>.CountAsync(BaseSpecification<Company> spec)
+        // Aşağıdaki metodlar BaseRepository'den geliyor, ancak override edilerek
+        // Company'ye özel logic eklenebilir
+
+        public override async Task<Company> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _dbSet
+                .Include(c => c.Dealer)
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        Task IBaseRepository<Company>.DeleteAsync(Company entity)
+        public override async Task<IReadOnlyList<Company>> ListAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbSet
+                .Include(c => c.Dealer)
+                .ToListAsync();
         }
 
-        Task<IReadOnlyList<Company>> IBaseRepository<Company>.GetActiveAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyList<Company>> IBaseRepository<Company>.GetAllWithStatusAsync(bool? isActive, bool? isDeleted)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyList<Company>> ICompanyRepository.GetByDealerIdAsync(int dealerId)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Company> IBaseRepository<Company>.GetByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Company> ICompanyRepository.GetBySlugAsync(string slug)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyList<Company>> IBaseRepository<Company>.GetDeletedAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Company> IBaseRepository<Company>.GetEntityWithSpec(BaseSpecification<Company> spec)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyList<Company>> IBaseRepository<Company>.GetInactiveAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyList<Company>> IBaseRepository<Company>.ListAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyList<Company>> IBaseRepository<Company>.ListAsync(BaseSpecification<Company> spec)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<bool> ICompanyRepository.SlugExistsAsync(string slug)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IBaseRepository<Company>.UpdateAsync(Company entity)
-        {
-            throw new NotImplementedException();
-        }
+        // Diğer BaseRepository metodları da gerekirse override edilebilir
     }
 }
