@@ -1,62 +1,87 @@
 ﻿using AutoMapper;
 using QRMenu.Application.Common;
+using QRMenu.Application.DTOs;
 using QRMenu.Application.DTOs.Theme;
 using QRMenu.Application.Interfaces;
+using QRMenu.Core.Entities;
 using QRMenu.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using QRMenu.Core.Specifications;
 
-namespace QRMenu.Infrastructure.Services
+public class ThemeService : IThemeService
 {
-    public class ThemeService : IThemeService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public ThemeService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
 
-        public ThemeService(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+    public async Task<Result<ThemeDto>> CreateAsync(ThemeDto model)
+    {
+        var entity = _mapper.Map<Theme>(model);
+        await _unitOfWork.Themes.AddAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
+        return Result<ThemeDto>.Success(_mapper.Map<ThemeDto>(entity));
+    }
 
-        public Task<Result<bool>> ActivateAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<Result<ThemeDto>> UpdateAsync(int id, ThemeDto model)
+    {
+        var entity = await _unitOfWork.Themes.GetByIdAsync(id);
+        if (entity == null)
+            return Result<ThemeDto>.Failure("Theme not found");
 
-        public Task<Result<ThemeDto>> CreateAsync(ThemeDto model)
-        {
-            throw new NotImplementedException();
-        }
+        _mapper.Map(model, entity);
+        await _unitOfWork.SaveChangesAsync();
+        return Result<ThemeDto>.Success(_mapper.Map<ThemeDto>(entity));
+    }
 
-        public Task<Result<bool>> DeactivateAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<Result<bool>> DeleteAsync(int id)
+    {
+        var entity = await _unitOfWork.Themes.GetByIdAsync(id);
+        if (entity == null)
+            return Result<bool>.Failure("Theme not found");
 
-        public Task<Result<bool>> DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        await _unitOfWork.Themes.DeleteAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
+        return Result<bool>.Success(true);
+    }
 
-        public Task<Result<List<ThemeDto>>> GetAllActiveAsync()
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<Result<ThemeDto>> GetByIdAsync(int id)
+    {
+        var entity = await _unitOfWork.Themes.GetByIdAsync(id);
+        if (entity == null)
+            return Result<ThemeDto>.Failure("Theme not found");
 
-        public Task<Result<ThemeDto>> GetByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        return Result<ThemeDto>.Success(_mapper.Map<ThemeDto>(entity));
+    }
 
-        public Task<Result<ThemeDto>> UpdateAsync(int id, ThemeDto model)
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<Result<List<ThemeDto>>> GetAllActiveAsync()
+    {
+        var entities = await _unitOfWork.Themes.GetActiveAsync();
+        return Result<List<ThemeDto>>.Success(_mapper.Map<List<ThemeDto>>(entities));
+    }
 
-        // IThemeService implementasyonu
+    public async Task<Result<bool>> ActivateAsync(int id)
+    {
+        var entity = await _unitOfWork.Themes.GetByIdAsync(id);
+        if (entity == null)
+            return Result<bool>.Failure("Theme not found");
+
+        entity.IsActive = true;
+        await _unitOfWork.SaveChangesAsync();
+        return Result<bool>.Success(true);
+    }
+
+    public async Task<Result<bool>> DeactivateAsync(int id)
+    {
+        var entity = await _unitOfWork.Themes.GetByIdAsync(id);
+        if (entity == null)
+            return Result<bool>.Failure("Theme not found");
+
+        entity.IsActive = false;
+        await _unitOfWork.SaveChangesAsync();
+        return Result<bool>.Success(true);
     }
 }
