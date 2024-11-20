@@ -1,6 +1,6 @@
 ﻿using QRMenu.Core.Enums;
- 
-namespace QRMenu.Application.DTOs.User
+
+namespace QRMenu.Application.DTOs
 {
     public class UserDto : BaseDto
     {

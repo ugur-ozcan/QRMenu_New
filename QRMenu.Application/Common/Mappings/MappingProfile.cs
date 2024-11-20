@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
-using QRMenu.Application.DTOs.Branch;
+using QRMenu.Application.DTOs;
 using QRMenu.Application.DTOs.Company;
-using QRMenu.Application.DTOs.CompanyThemeDto;
-using QRMenu.Application.DTOs.Dealer;
-using QRMenu.Application.DTOs.Template;
-using QRMenu.Application.DTOs.Theme;
-using QRMenu.Application.DTOs.User;
 using QRMenu.Core.Entities;
 
 namespace QRMenu.Application.Common.Mappings;

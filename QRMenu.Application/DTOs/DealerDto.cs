@@ -1,6 +1,4 @@
-﻿ 
-
-namespace QRMenu.Application.DTOs.Dealer
+﻿namespace QRMenu.Application.DTOs
 {
     public class DealerDto : BaseDto
     {

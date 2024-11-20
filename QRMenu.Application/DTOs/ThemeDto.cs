@@ -1,6 +1,4 @@
-﻿ 
-
-namespace QRMenu.Application.DTOs.Theme
+﻿namespace QRMenu.Application.DTOs
 {
     public class ThemeDto : BaseDto
     {

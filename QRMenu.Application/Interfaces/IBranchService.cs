@@ -1,6 +1,6 @@
 ﻿
 using QRMenu.Application.Common;
-using QRMenu.Application.DTOs.Branch;
+using QRMenu.Application.DTOs;
 
 namespace QRMenu.Application.Interfaces
 {

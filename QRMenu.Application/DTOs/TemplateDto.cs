@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QRMenu.Application.DTOs.Template
+namespace QRMenu.Application.DTOs
 {
     public class TemplateDto : BaseDto
     {

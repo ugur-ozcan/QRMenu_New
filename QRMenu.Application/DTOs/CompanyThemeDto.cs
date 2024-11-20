@@ -1,12 +1,10 @@
-﻿using QRMenu.Application.DTOs.Template;
-using QRMenu.Application.DTOs.Theme;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QRMenu.Application.DTOs.CompanyThemeDto
+namespace QRMenu.Application.DTOs
 {
     public class CompanyThemeDto : BaseDto
     {

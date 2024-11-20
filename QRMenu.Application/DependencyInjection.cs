@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using QRMenu.Application.Interfaces;
-using QRMenu.Infrastructure.Services;
-using System.Reflection;
+ using System.Reflection;
 using MediatR;
 using FluentValidation;
 using QRMenu.Core.Interfaces;
