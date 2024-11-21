@@ -3,6 +3,7 @@ using QRMenu.Application.Interfaces;
 using QRMenu.Core.Entities;
 using QRMenu.Core.Enums;
 using QRMenu.Core.Interfaces;
+using QRMenu.Core.Specifications;
 
 namespace QRMenu.Infrastructure.Services;
 

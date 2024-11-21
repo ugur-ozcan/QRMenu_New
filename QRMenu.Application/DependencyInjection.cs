@@ -1,19 +1,35 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FluentValidation;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using QRMenu.Application.Behaviors;
 
-namespace QRMenu.Application;
-
-public static class DependencyInjection
+namespace QRMenu.Application
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static class DependencyInjection
     {
-        // Tüm application içindeki assemblyleri al ve AutoMapper için kaydet
-        var types = Assembly.GetExecutingAssembly();
-        services.AddAutoMapper(types);
+        public static IServiceCollection AddApplication(this IServiceCollection services)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
 
-        // MediatR için registration
-        services.AddMediatR(x => x.RegisterServicesFromAssembly(types));
+            // Register AutoMapper
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(assembly);
+            });
 
-        return services;
+            // Register MediatR with Behaviors
+            services.AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssembly(assembly);
+                config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+                config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            });
+
+            // Register FluentValidation
+            services.AddValidatorsFromAssembly(assembly);
+
+            return services;
+        }
     }
 }

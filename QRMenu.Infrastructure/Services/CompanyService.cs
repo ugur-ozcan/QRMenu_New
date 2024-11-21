@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using QRMenu.Application.Common;
-using QRMenu.Application.DTOs.Company;
+using QRMenu.Application.DTOs;
 using QRMenu.Application.Interfaces;
 using QRMenu.Core.Interfaces;
 using System;
