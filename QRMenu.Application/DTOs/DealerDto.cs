@@ -10,5 +10,7 @@
         public string Address { get; set; }
         public string InstagramHandle { get; set; }
         public DateTime LicenseExpiryDate { get; set; }
+        public ICollection<CompanyDto> Companies { get; set; }
+        public int CompaniesCount => Companies?.Count ?? 0;
     }
 }

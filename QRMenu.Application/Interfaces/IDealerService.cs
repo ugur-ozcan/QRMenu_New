@@ -11,6 +11,7 @@ namespace QRMenu.Application.Interfaces
         Task<Result<bool>> DeleteAsync(int id);
         Task<Result<DealerDto>> GetByIdAsync(int id);
         Task<Result<PaginatedResult<DealerDto>>> GetAllAsync(int pageNumber, int pageSize, bool? isActive = null, bool? isDeleted = null);
+
         Task<Result<bool>> ActivateAsync(int id);
         Task<Result<bool>> DeactivateAsync(int id);
         Task<Result<bool>> ExtendLicenseAsync(int id, DateTime newExpiryDate);

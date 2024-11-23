@@ -24,6 +24,10 @@ namespace QRMenu.Infrastructure.Persistence
         {
             _context = context;
         }
+
+        private IBaseRepository<Log> _logs;
+        public IBaseRepository<Log> Logs =>
+            _logs ??= new BaseRepository<Log>(_context);
         public IBaseRepository<Notification> Notifications =>
        _notifications ??= new BaseRepository<Notification>(_context);
         public IBaseRepository<User> Users =>

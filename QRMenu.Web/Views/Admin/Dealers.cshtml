@@ -1,0 +1,202 @@
+﻿@using QRMenu.Application.DTOs
+@using QRMenu.Application.Common
+@model PaginatedResult<DealerDto>
+@{
+    ViewData["Title"] = "Bayi Yönetimi";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Bayi Listesi</h5>
+        <button type="button" class="btn btn-primary" onclick="showAddDealerModal()">
+            <i class="fas fa-plus"></i> Yeni Bayi
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex gap-2">
+                    <select id="pageSize" class="form-select form-select-sm" style="width: auto">
+                        <option value="10">10 Kayıt</option>
+                        <option value="25">25 Kayıt</option>
+                        <option value="50">50 Kayıt</option>
+                        <option value="100">100 Kayıt</option>
+                    </select>
+
+                    <select id="status" class="form-select form-select-sm" style="width: auto">
+                        <option value="">Tümü</option>
+                        <option value="true">Aktif</option>
+                        <option value="false">Pasif</option>
+                    </select>
+                </div>
+            </div>
+
+            <table class="table table-hover table-bordered" id="dealersTable">
+                <thead>
+                    <tr>
+                        <th>Logo</th>
+                        <th>Adı</th>
+                        <th>İletişim Kişisi</th>
+                        <th>Email</th>
+                        <th>Telefon</th>
+                        <th>Adres</th>
+                        <th>Instagram</th>
+                        <th>Lisans Bitiş</th>
+                        <th>Firma Sayısı</th>
+                        <th>Durum</th>
+                        <th style="width: 120px">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dealer in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(dealer.Logo))
+                                {
+                                    <img src="@dealer.Logo" alt="logo" class="img-thumbnail" style="max-width: 50px" />
+                                }
+                            </td>
+                            <td>@dealer.Name</td>
+                            <td>@dealer.ContactPerson</td>
+                            <td>@dealer.Email</td>
+                            <td>@dealer.PhoneNumber</td>
+                            <td>@dealer.Address</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(dealer.InstagramHandle))
+                                {
+                                    <a href="https://instagram.com/@dealer.InstagramHandle" target="_blank">
+                                        @@@dealer.InstagramHandle
+                                    </a>
+                                }
+                            </td>
+                            <td>@dealer.LicenseExpiryDate.ToShortDateString()</td>
+                            <td>@dealer.CompaniesCount</td>
+                            <td>
+                                @if (dealer.IsActive)
+                                {
+                                    <span class="badge bg-success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Pasif</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-info" onclick="viewDealer(@dealer.Id)" title="Detay">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-primary" onclick="editDealer(@dealer.Id)" title="Düzenle">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger" onclick="deleteDealer(@dealer.Id)" title="Sil">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (Model.TotalPages > 1)
+            {
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        Toplam @Model.TotalCount kayıt
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="javascript:void(0)" onclick="loadPage(@(Model.PageIndex-1))">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            }
+
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                    <a class="page-link" href="javascript:void(0)" onclick="loadPage(@i)">@i</a>
+                                </li>
+                            }
+
+                            @if (Model.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="javascript:void(0)" onclick="loadPage(@(Model.PageIndex+1))">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Bayi Ekleme/Düzenleme Modal -->
+<div class="modal fade" id="dealerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Yeni Bayi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="dealerForm">
+                    <input type="hidden" id="dealerId" />
+                    <div class="mb-3">
+                        <label class="form-label">Logo</label>
+                        <input type="file" class="form-control" id="logo" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bayi Adı</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">İletişim Kişisi</label>
+                        <input type="text" class="form-control" id="contactPerson" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefon</label>
+                        <input type="tel" class="form-control" id="phoneNumber" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Adres</label>
+                        <textarea class="form-control" id="address" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Instagram</label>
+                        <div class="input-group">
+                            @* <span class="input-group-text">@</span> *@
+                            <input type="text" class="form-control" id="instagramHandle">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lisans Bitiş Tarihi</label>
+                        <input type="date" class="form-control" id="licenseExpiryDate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="saveDealer()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+@section Scripts {
+    <script src="//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"></script>
+}

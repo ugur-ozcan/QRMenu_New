@@ -12,14 +12,20 @@ namespace QRMenu.Core.Entities
         public string Location { get; set; }
         public string CategoryView { get; set; }
         public string ProductView { get; set; }
-        public string LanguagesSupported { get; set; }
-        public string DefaultLanguage { get; set; }
+         public string DefaultLanguage { get; set; }
         public bool ShowTableNumbers { get; set; }
         public string SyncInterval { get; set; }
         public DateTime? LastSyncDate { get; set; }
 
         // Navigation properties
         public virtual Company Company { get; set; }
+
+        private List<string> _languagesSupported = new();
+        public List<string> LanguagesSupported
+        {
+            get => _languagesSupported;
+            set => _languagesSupported = value ?? new List<string>();
+        }
     }
 
 }

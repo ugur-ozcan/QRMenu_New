@@ -1,21 +1,32 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using QRMenu.Application.Interfaces;
 using QRMenu.Core.Interfaces;
 using QRMenu.Infrastructure.Persistence;
 using QRMenu.Infrastructure.Persistence.Repositories;
 using QRMenu.Infrastructure.Services;
+ 
 
 namespace QRMenu.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(
+    this IServiceCollection services,
+    IConfiguration configuration)
     {
         // DbContext
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+        // Add HttpContextAccessor
+        services.AddHttpContextAccessor();
+        services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+
+        // Core Services
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // Repositories
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
@@ -26,7 +37,7 @@ public static class DependencyInjection
         // UnitOfWork
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        // Services
+        // Application Services
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<IDealerService, DealerService>();
         services.AddScoped<IBranchService, BranchService>();

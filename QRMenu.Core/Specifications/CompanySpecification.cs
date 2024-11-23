@@ -1,4 +1,6 @@
-﻿namespace QRMenu.Core.Specifications
+﻿using QRMenu.Core.Entities;
+
+namespace QRMenu.Core.Specifications
 {
     public class CompanySpecification : BaseSpecification<Company>
     {

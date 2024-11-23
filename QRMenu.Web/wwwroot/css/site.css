@@ -29,3 +29,151 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+ 
+
+/* Sidebar */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    min-height: 100vh;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    transition: all 0.3s;
+    color: #fff;
+}
+
+    #sidebar.active {
+        margin-left: -250px;
+    }
+
+#content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+    #content.active {
+        margin-left: 0;
+    }
+
+/* Sidebar içerik */
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #232f3e;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+}
+
+#sidebar ul li a {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    display: block;
+    color: #fff;
+    text-decoration: none;
+}
+
+    #sidebar ul li a:hover {
+        background: #232f3e;
+    }
+
+/* Responsive */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+
+        #sidebar.active {
+            margin-left: 0;
+        }
+
+    #content {
+        margin-left: 0;
+    }
+
+        #content.active {
+            margin-left: 250px;
+        }
+}
+
+
+.table thead th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table tbody tr:hover {
+    background: #f5f5f5;
+}
+
+.pagination .page-link {
+    padding: .5rem .75rem;
+    color: #4e73df;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+ 
+}
+
+/* Card Styles */
+.card {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    border: none;
+    border-radius: 0.35rem;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+    .btn-primary:hover {
+        background-color: #2e59d9;
+        border-color: #2e59d9;
+    }
+
+/* Navbar Styles */
+.navbar {
+    padding: 15px;
+    background: white;
+    border: none;
+    border-radius: 0;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    border-left: .25rem solid;
+    border-radius: .35rem;
+}
+
+    .dashboard-card.primary {
+        border-left-color: #4e73df;
+    }
+
+    .dashboard-card.success {
+        border-left-color: #1cc88a;
+    }
+
+    .dashboard-card.info {
+        border-left-color: #36b9cc;
+    }
+
+
+    

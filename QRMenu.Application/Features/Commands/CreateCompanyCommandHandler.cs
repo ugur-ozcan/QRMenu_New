@@ -3,7 +3,8 @@ using MediatR;
 using QRMenu.Application.Common;
 using QRMenu.Application.DTOs;
  using QRMenu.Application.Interfaces;
- using QRMenu.Core.Interfaces;
+using QRMenu.Core.Entities;
+using QRMenu.Core.Interfaces;
 using QRMenu.Core.Security;
 using QRMenu.Core.ValueObjects;
 
@@ -44,7 +45,8 @@ public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand,
             ProductView = request.ProductView,
             UseBranches = request.UseBranches,
             ShowTableNumbers = request.ShowTableNumbers,
-            LanguagesSupported = string.Join(",", request.LanguagesSupported),
+            LanguagesSupported = request.LanguagesSupported != null ?
+                string.Join(",", request.LanguagesSupported) : "",
             DefaultLanguage = request.DefaultLanguage,
             CreatedAt = DateTime.UtcNow,
             IsActive = true,

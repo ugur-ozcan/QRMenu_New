@@ -18,7 +18,10 @@ namespace QRMenu.Application.Behaviors
             _currentUserService = currentUserService;
         }
 
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(
+            TRequest request,
+            RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken)
         {
             var requestName = request.GetType().Name;
             var userId = _currentUserService.UserId;

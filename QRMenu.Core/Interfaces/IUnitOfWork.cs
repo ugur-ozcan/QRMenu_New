@@ -12,6 +12,8 @@ namespace QRMenu.Core.Interfaces
         IBaseRepository<Template> Templates { get; }
         IBaseRepository<CompanyTheme> CompanyThemes { get; }
         IBaseRepository<Notification> Notifications { get; } // Bunu ekledik
+        IBaseRepository<Log> Logs { get; }  // Log repository'sini ekledik
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
