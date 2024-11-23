@@ -20,6 +20,7 @@ namespace QRMenu.Infrastructure.Persistence
         public DbSet<Dealer> Dealers { get; set; }
         public DbSet<CompanyTheme> CompanyThemes { get; set; }
         public DbSet<Log> Logs { get; set; }  // Log entity'sini ekledik
+        public DbSet<NotificationSetting> NotificationSettings { get; set; }  // Log entity'sini ekledik
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +28,10 @@ namespace QRMenu.Infrastructure.Persistence
 
             modelBuilder.Entity<Company>(builder =>
             {
+                base.OnModelCreating(modelBuilder);
+
+               
+
                 builder.ToTable("Companies");
                 builder.HasKey(e => e.Id);
 

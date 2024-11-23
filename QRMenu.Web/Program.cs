@@ -7,12 +7,12 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add logging
+// Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
@@ -20,67 +20,48 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
-// CORS Policy
+// Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder =>
-        {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
 });
 
-// Authentication ayarlarý
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie(options =>
-{
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/AccessDenied";
-    options.ExpireTimeSpan = TimeSpan.FromDays(30);
-    options.SlidingExpiration = true;
-    options.Cookie.Name = "QRMenu.Auth";
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-});
+// Add authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
+        options.SlidingExpiration = true;
+        options.Cookie.Name = "QRMenu.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
 
-// Add Application Layer
+// Add Application and Infrastructure layers
 builder.Services.AddApplication();
-
-// Add Infrastructure Layer
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
-// Add Authorization
+// Add authorization policies
 builder.Services.AddAuthorization(options =>
 {
-    // Default policy
-    options.AddPolicy("RequireAuthenticatedUser", policy =>
-        policy.RequireAuthenticatedUser());
-
-    // Admin policy
-    options.AddPolicy("RequireAdminRole", policy =>
-        policy.RequireRole("Admin"));
-
-    // DealerAdmin policy
-    options.AddPolicy("RequireDealerAdminRole", policy =>
-        policy.RequireRole("DealerAdmin"));
-
-    // CompanyAdmin policy
-    options.AddPolicy("RequireCompanyAdminRole", policy =>
-        policy.RequireRole("CompanyAdmin"));
+    options.AddPolicy("RequireAuthenticatedUser", policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("RequireDealerAdminRole", policy => policy.RequireRole("DealerAdmin"));
+    options.AddPolicy("RequireCompanyAdminRole", policy => policy.RequireRole("CompanyAdmin"));
 });
 
-// Session configuration
+// Add session configuration
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -88,12 +69,16 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Memory Cache
+// Add memory cache
 builder.Services.AddMemoryCache();
+
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// Seed Database
+// Seed database
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -121,8 +106,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
-// Middleware pipeline kýsmýný þu þekilde düzenleyin
+// Configure middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -134,16 +118,12 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
-app.UseStaticFiles(); // Statik dosyalar için
-
-
 app.UseCors("AllowAll");
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-
- 
 
 // Global error handling
 app.UseExceptionHandler(errorApp =>
@@ -168,10 +148,10 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
+// Configure default route
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
- 
 
 app.Run();
