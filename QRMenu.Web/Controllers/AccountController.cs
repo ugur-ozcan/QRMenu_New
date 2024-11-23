@@ -48,11 +48,11 @@ namespace QRMenu.Web.Controllers
                 if (result.IsSuccess)
                 {
                     var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, result.Data.FullName),
-                new Claim(ClaimTypes.Email, result.Data.Email),
-                new Claim("UserId", result.Data.Id.ToString())
-            };
+                    {
+                        new Claim(ClaimTypes.Name, result.Data.FullName),
+                        new Claim(ClaimTypes.Email, result.Data.Email),
+                        new Claim("UserId", result.Data.Id.ToString())
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(
@@ -69,13 +69,13 @@ namespace QRMenu.Web.Controllers
                 await _logService.LogErrorAsync(
                     module: "Account",
                     action: "Login",
-                    details: $"Başarısız giriş denemesi: {model.Email}");
+                    details: $"Başarısız giriş denemesi: {model.Email}",
+                    exception: new UnauthorizedAccessException("Geçersiz giriş denemesi"));
 
                 ModelState.AddModelError("", "Geçersiz email veya şifre");
             }
             return View(model);
         }
-
 
         // GET: Profile
         [HttpGet]
@@ -101,6 +101,7 @@ namespace QRMenu.Web.Controllers
 
         // POST: Profile
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Profile(ProfileViewModel model)
         {
             if (ModelState.IsValid)
@@ -121,10 +122,15 @@ namespace QRMenu.Web.Controllers
 
         // GET: Logout
         [HttpGet]
-        public async Task<IActionResult> Logout()
+         public async Task<IActionResult> Logout()
         {
+            // Loglama
             await _logService.LogInformationAsync("Account", "Logout", $"Kullanıcı çıkış yaptı: {_currentUserService.Email}");
-            await HttpContext.SignOutAsync();
+
+            // Oturumu kapatma
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Login sayfasına yönlendirme
             return RedirectToAction("Login", "Account");
         }
 
