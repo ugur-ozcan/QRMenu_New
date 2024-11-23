@@ -109,15 +109,14 @@
                     </div>
                 </div>
             </nav>
-
             <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-user"></i> Profil
                 </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/Account/Profile">Profilimi Güncelle</a>
-                    <a class="dropdown-item" href="/Account/Logout">Çıkış</a>
-                </div>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" href="/Account/Profile">Profilimi Güncelle</a></li>
+                    <li><a class="dropdown-item" href="/Account/Logout">Çıkış Yap</a></li>
+                </ul>
             </div>
             <div class="container-fluid p-4">
                 @RenderBody()

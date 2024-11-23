@@ -48,33 +48,25 @@ namespace QRMenu.Web.Controllers
                 if (result.IsSuccess)
                 {
                     var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Email, result.Data.Email),
-                        new Claim(ClaimTypes.Role, result.Data.Role.ToString()),
-                        new Claim("UserId", result.Data.Id.ToString())
-                    };
+            {
+                new Claim(ClaimTypes.Name, result.Data.FullName),
+                new Claim(ClaimTypes.Email, result.Data.Email),
+                new Claim("UserId", result.Data.Id.ToString())
+            };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity),
-                        new AuthenticationProperties
-                        {
-                            IsPersistent = model.RememberMe
-                        });
+                        new AuthenticationProperties { IsPersistent = model.RememberMe });
 
-                    // Log kaydı ekleme
-                    await _logService.LogInformationAsync(
-                        module: "Account",
-                        action: "Login",
-                        details: $"Kullanıcı başarıyla giriş yaptı: {model.Email}",
-                        userId: result.Data.Id);
+                    await _logService.LogInformationAsync("Account", "Login", $"Kullanıcı başarıyla giriş yaptı: {model.Email}", userId: result.Data.Id);
 
                     return RedirectToAction("Index", "Home");
                 }
 
-                // Başarısız giriş logu
-                await _logService.LogWarningAsync(
+                // Başarısız giriş logu (Error olarak değiştirildi)
+                await _logService.LogErrorAsync(
                     module: "Account",
                     action: "Login",
                     details: $"Başarısız giriş denemesi: {model.Email}");
@@ -83,6 +75,7 @@ namespace QRMenu.Web.Controllers
             }
             return View(model);
         }
+
 
         // GET: Profile
         [HttpGet]
@@ -130,14 +123,10 @@ namespace QRMenu.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            // Kullanıcı çıkış logunu kaydet
             await _logService.LogInformationAsync("Account", "Logout", $"Kullanıcı çıkış yaptı: {_currentUserService.Email}");
-
-            // Oturumu sonlandır
             await HttpContext.SignOutAsync();
-
-            // Çıkış yaptıktan sonra giriş sayfasına yönlendirin
             return RedirectToAction("Login", "Account");
         }
+
     }
 }
