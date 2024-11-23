@@ -13,6 +13,8 @@ namespace QRMenu.Core.Entities
         public int? CompanyId { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public string LastLoginIp { get; set; }
+        public string? PhoneNumber { get; set; } // Yeni eklenen alan
+
 
         // Navigation properties
         public virtual Dealer Dealer { get; set; }

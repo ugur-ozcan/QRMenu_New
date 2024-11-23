@@ -26,7 +26,7 @@ public static class DependencyInjection
         services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
         // Core Services
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
+         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // Repositories
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));

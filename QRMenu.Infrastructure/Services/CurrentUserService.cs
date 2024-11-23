@@ -14,7 +14,21 @@ namespace QRMenu.Infrastructure.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public int? UserId => GetClaimValue<int>("UserId");
+        public int? UserId
+        {
+            get
+            {
+                var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value;
+                return string.IsNullOrEmpty(userIdClaim) ? (int?)null : int.Parse(userIdClaim);
+            }
+        }
+        public string IpAddress
+        {
+            get
+            {
+                return _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
+            }
+        }
         public string UserName => GetClaimValue<string>(ClaimTypes.Name);
         public string Email => GetClaimValue<string>(ClaimTypes.Email);
         public UserRole? Role => GetClaimValue<UserRole>("Role");

@@ -16,5 +16,8 @@ namespace QRMenu.Application.ViewModels
         public int? CompanyId { get; set; }
         public string OldValues { get; set; }
         public string NewValues { get; set; }
+
+        // Kullanıcının rolü (örn. Admin, User)
+        public string UserRole { get; set; } // Eksik olan alan eklendi
     }
 }

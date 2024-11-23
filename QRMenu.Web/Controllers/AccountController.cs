@@ -3,25 +3,32 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using QRMenu.Application.Interfaces;
 using QRMenu.Application.ViewModels;
+using QRMenu.Core.Interfaces;
 using QRMenu.Web.Models;
 using System.Security.Claims;
 
 namespace QRMenu.Web.Controllers
 {
-    // AccountController.cs
     public class AccountController : Controller
     {
-        private readonly IUserService _userService;
-        private readonly ILogService _logService; // Ekledik
+        private readonly IUserService _userService; // Kullanıcı servisi
+        private readonly ILogService _logService; // Loglama servisi
+        private readonly ICurrentUserService _currentUserService; // Mevcut kullanıcı bilgileri
+        private readonly IUnitOfWork _unitOfWork; // Veritabanı işlemleri için
 
         public AccountController(
             IUserService userService,
-            ILogService logService) // Constructor'a ekledik
+            ICurrentUserService currentUserService,
+            IUnitOfWork unitOfWork,
+            ILogService logService)
         {
             _userService = userService;
             _logService = logService;
+            _currentUserService = currentUserService;
+            _unitOfWork = unitOfWork;
         }
 
+        // GET: Login
         [HttpGet]
         public IActionResult Login()
         {
@@ -30,6 +37,7 @@ namespace QRMenu.Web.Controllers
             return View();
         }
 
+        // POST: Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -40,11 +48,11 @@ namespace QRMenu.Web.Controllers
                 if (result.IsSuccess)
                 {
                     var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email, result.Data.Email),
-                    new Claim(ClaimTypes.Role, result.Data.Role.ToString()),
-                    new Claim("UserId", result.Data.Id.ToString())
-                };
+                    {
+                        new Claim(ClaimTypes.Email, result.Data.Email),
+                        new Claim(ClaimTypes.Role, result.Data.Role.ToString()),
+                        new Claim("UserId", result.Data.Id.ToString())
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(
@@ -55,7 +63,7 @@ namespace QRMenu.Web.Controllers
                             IsPersistent = model.RememberMe
                         });
 
-                    // Log kaydı ekledik
+                    // Log kaydı ekleme
                     await _logService.LogInformationAsync(
                         module: "Account",
                         action: "Login",
@@ -76,21 +84,60 @@ namespace QRMenu.Web.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Logout()
+        // GET: Profile
+        [HttpGet]
+        public async Task<IActionResult> Profile()
         {
-            // Çıkış logu
-            if (User.Identity.IsAuthenticated)
+            var userId = _currentUserService.UserId;
+            if (!userId.HasValue)
             {
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
-                await _logService.LogInformationAsync(
-                    module: "Account",
-                    action: "Logout",
-                    details: $"Kullanıcı çıkış yaptı: {User.FindFirst(ClaimTypes.Email)?.Value}",
-                    userId: userId);
+                return RedirectToAction("Login", "Account");
             }
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login");
+            var user = await _unitOfWork.Users.GetByIdAsync(userId.Value);
+
+            var profileViewModel = new ProfileViewModel
+            {
+                FullName = user.FullName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            return View(profileViewModel);
+        }
+
+        // POST: Profile
+        [HttpPost]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _unitOfWork.Users.GetByIdAsync(_currentUserService.UserId.Value);
+                user.FullName = model.FullName;
+                user.Email = model.Email;
+                user.PhoneNumber = model.PhoneNumber;
+
+                await _unitOfWork.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Profil başarıyla güncellendi.";
+                return RedirectToAction("Profile");
+            }
+
+            return View(model);
+        }
+
+        // GET: Logout
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            // Kullanıcı çıkış logunu kaydet
+            await _logService.LogInformationAsync("Account", "Logout", $"Kullanıcı çıkış yaptı: {_currentUserService.Email}");
+
+            // Oturumu sonlandır
+            await HttpContext.SignOutAsync();
+
+            // Çıkış yaptıktan sonra giriş sayfasına yönlendirin
+            return RedirectToAction("Login", "Account");
         }
     }
 }

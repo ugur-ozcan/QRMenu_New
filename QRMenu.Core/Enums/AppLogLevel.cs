@@ -1,6 +1,6 @@
 ﻿namespace QRMenu.Core.Enums
 {
-    public enum LogLevel
+    public enum AppLogLevel
     {
         Info,
         Warning,
