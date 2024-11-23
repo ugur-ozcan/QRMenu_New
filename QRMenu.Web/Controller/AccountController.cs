@@ -5,7 +5,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using QRMenu.Application.Interfaces;
-using QRMenu.Web.Models;
+//using QRMenu.Web.Models;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
@@ -21,7 +21,7 @@ namespace QRMenu.Web.Controllers
             _userService = userService;
             _logger = logger;
         }
-
+        //deneme
         // GET: /Account/Login - Kullanıcı giriş sayfasını render eder
         [HttpGet]
         public IActionResult Login()
