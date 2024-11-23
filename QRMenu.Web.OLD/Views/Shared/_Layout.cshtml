@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QRMenu</title>
+    <link rel="stylesheet" href="~/css/styles.css" />
+</head>
+<body>
+    <div class="sidebar">
+        <!-- Sidebar içeriği buraya -->
+        <ul>
+            <li><a asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+            <li><a asp-controller="Customers" asp-action="Index">Müşteriler</a></li>
+            <li><a asp-controller="Orders" asp-action="Index">Siparişler</a></li>
+            <li><a asp-controller="Reports" asp-action="Index">Raporlar</a></li>
+            <li><a asp-controller="Settings" asp-action="Index">Ayarlar</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        @RenderBody()
+    </div>
+    <script src="~/js/script.js"></script>
+</body>
+</html>
