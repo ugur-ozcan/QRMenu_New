@@ -1,7 +1,7 @@
 ﻿// QRMenu.Web/Controllers/AccountController.cs
 using Microsoft.AspNetCore.Mvc;
-using QRMenu.Web.Models;
-
+using QRMenu.Application.ViewModels;
+ 
 namespace QRMenu.Web.Controllers
 {
     public class AccountController : Controller

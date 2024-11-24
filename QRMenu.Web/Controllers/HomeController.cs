@@ -6,7 +6,7 @@ namespace QRMenu.Web.Controllers
     {
         public IActionResult Index()
         {
-            return View(); // Bu, `Views/Home/Index.cshtml` dosyasını yükler.
+            return View();
         }
     }
 }

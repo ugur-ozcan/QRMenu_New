@@ -1,0 +1,35 @@
+﻿@model QRMenu.Web.ViewModels.SidebarViewModel
+
+
+<div class="h-full flex flex-col">
+    <!-- Logo -->
+    <div class="p-4 border-b dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+            <img src="~/images/logo.png" alt="Logo" class="w-8 h-8">
+            <span class="text-xl font-bold text-gray-800 dark:text-white">QR Menu</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-4 py-6 space-y-2">
+        @foreach (var menuItem in Model.MenuItems)
+        {
+            <a href="@menuItem.Url"
+               class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 @(menuItem.IsActive ? "bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-200" : "")">
+                <i class="@menuItem.Icon w-5 h-5 mr-3"></i>
+                <span>@menuItem.Title</span>
+            </a>
+        }
+    </nav>
+
+    <!-- User Info -->
+    <div class="p-4 border-t dark:border-gray-700">
+        <div class="flex items-center space-x-3">
+            <img src="@Model.UserAvatar" alt="User" class="w-10 h-10 rounded-full">
+            <div>
+                <p class="text-sm font-medium text-gray-800 dark:text-white">@Model.UserName</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">@Model.UserRole</p>
+            </div>
+        </div>
+    </div>
+</div>

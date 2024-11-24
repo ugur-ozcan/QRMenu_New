@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<ItemGroup>
 		<ProjectReference Include="..\QRMenu.Application\QRMenu.Application.csproj" />
@@ -11,11 +11,27 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
+	
+	<ItemGroup>
+		<None Include="package.json" />
+		<None Include="tailwind.config.js" />
+		<None Include="postcss.config.js" />
+		<None Include="wwwroot\css\input.css" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="Views\Bayi\" />
+	  <Folder Include="Views\Firma\" />
+	  <Folder Include="Views\NewFolder\" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		
+		<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+		<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
 	</PropertyGroup>
 
 </Project>

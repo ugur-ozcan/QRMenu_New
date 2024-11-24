@@ -15,7 +15,13 @@ public static class ApplicationDbContextSeed
                 FullName = "Admin User",
                 Role = UserRole.Admin,
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                LastLoginDate = DateTime.UtcNow,
+                LastLoginIp ="127.0.0.1",
+                IsDeleted = false,
+                PhoneNumber="123456789" 
+                
+                
             };
 
             context.Users.Add(defaultUser);

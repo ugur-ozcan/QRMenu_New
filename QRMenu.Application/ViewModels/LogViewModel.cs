@@ -1,4 +1,4 @@
-﻿ 
+﻿
 namespace QRMenu.Application.ViewModels
 {
     public class LogViewModel

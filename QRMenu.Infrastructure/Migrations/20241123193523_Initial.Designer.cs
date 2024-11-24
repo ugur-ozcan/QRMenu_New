@@ -12,8 +12,8 @@ using QRMenu.Infrastructure.Persistence;
 namespace QRMenu.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241123072912_AddLogsTable")]
-    partial class AddLogsTable
+    [Migration("20241123193523_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -308,11 +308,9 @@ namespace QRMenu.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Exception")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IpAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -329,11 +327,9 @@ namespace QRMenu.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NewValues")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OldValues")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -355,6 +351,51 @@ namespace QRMenu.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Logs", (string)null);
+                });
+
+            modelBuilder.Entity("QRMenu.Core.Entities.NotificationSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ReceiveEmailNotifications")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ReceiveErrorNotifications")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ReceiveInfoNotifications")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ReceiveSyncErrorNotifications")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ReceiveWarningNotifications")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("NotificationSettings");
                 });
 
             modelBuilder.Entity("QRMenu.Core.Entities.Template", b =>
@@ -498,6 +539,9 @@ namespace QRMenu.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
@@ -568,6 +612,17 @@ namespace QRMenu.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("QRMenu.Core.Entities.NotificationSetting", b =>
+                {
+                    b.HasOne("QRMenu.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
